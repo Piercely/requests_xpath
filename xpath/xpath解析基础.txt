@@ -1,0 +1,9 @@
+from lxml import etree
+if __name__=="__main__":
+    #实例化好一个etree对象，且将被解析的源码加载到了该对象中
+    tree=etree.parse('test.html')#'test.html'需改
+    r=tree.xpath('/html/body/div')#一个(/)表示一个层级
+    r=tree.xpath('/html//div')#(//)表示俩个层级
+    r=tree.xpath('//div')#
+    r=tree.xpath('//div[@class="song"]')#固定格式“song”需改
+    r=tree.xpath('//div[@class="tang"]/ul/li[5]#表示第5个数据/a/text()#变为文本')[0]#去列表格式

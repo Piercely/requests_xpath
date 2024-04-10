@@ -1,0 +1,24 @@
+import requests
+import re
+
+
+key = input('请输入你想下载的图片：')
+headers = {
+        'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.116 Safari/537.36'
+    }
+url = 'https://image.baidu.com/search/flip?tn=baiduimage&ipn=r&ct=201326592&cl=2&lm=-1&st=-1&fm=result&fr=&sf=1&fmq=1595376564352_R&pv=&ic=&nc=1&z=&hd=&latest=&copyright=&se=1&showtab=0&fb=0&width=&height=&face=0&istype=2&ie=utf-8&ctd=1595376564354%5E00_1212X622&sid=&word='+key
+result = requests.get(url,headers=headers).text
+req = re.findall(r'"objURL":"(.*?)"',result)
+for i in req:
+    name = i[-10:]
+    name = re.sub('/','',name)
+    end = re.search('(\.jpg|\.png|\.jpeg|\.gif)$',name)
+    if end == None:
+        name = name + '.jpg'
+    # print(name)
+    with open('album/%s'%name,'wb')as f:
+        try:
+            r = requests.get(i).content
+        except Exception as e:
+            print(e)
+        f.write(r)

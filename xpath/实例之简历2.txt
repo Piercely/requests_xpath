@@ -1,0 +1,56 @@
+import requests
+from lxml import etree
+import os
+
+# rar保存的文件夹
+if not os.path.exists('./免费简历模板'):
+    os.mkdir('./免费简历模板')
+
+# 待爬取网页
+url='https://aspx.sc.chinaz.com/query.aspx?'
+headers={
+    'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) '
+                 'AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.54 Safari/537.36'
+}
+parameters={
+    'keyword': '免费',
+    'classID': '864'
+}
+
+# 爬取出的源文件
+page_text=requests.get(url=url,params=parameters,headers=headers).text
+
+# xpath解析
+page_text_etree=etree.HTML(page_text)
+page_text_etree_list=page_text_etree.xpath('//div[@id="container"]/div')
+
+for div in page_text_etree_list:
+    # 下载链接
+    download_src=div.xpath('./a/@href')[0]
+    # 模板标题
+    template_title=div.xpath('./a//@alt')[0]
+    # 拼接成一个完整的url
+    download_url="https:"+download_src
+    # print(template_title+'\t'+download_url)
+
+    #  进行下载
+    # 返回的是下载页面的源数据
+    download_src_html=requests.get(url=download_url,headers=headers).text
+    #  下载页面数据解析
+    download_etree = etree.HTML(download_src_html)
+    # 这里一定要li[1] 不然会有所有li的下载地址
+    download_url_zip = download_etree.xpath('//div[@class="clearfix mt20 downlist"]'
+                                            '/ul/li[1]/a/@href')[0]
+    # print(download_url_zip)
+    #  zip包转二进制数据
+    zip_content = requests.get(url=download_url_zip, headers=headers).content
+
+    # template路径
+    templatePath = './免费简历模板/' + template_title + '.rar'
+
+    # 持久化存储
+    with open(templatePath, 'ab', ) as fp:
+        # zip写入到文件夹
+        fp.write(zip_content)
+        print(templatePath + "爬取完毕")
+print('successful！!!')

@@ -1,0 +1,20 @@
+#UA伪装的反爬机制，让对应的请求载体伪装成某一款浏览器
+import requests
+if __name__=="__main__":
+    #UA伪装：将对应的User=Agent封装到一个字典中
+    headers={
+        'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.93 Safari/537.36 Edg/96.0.1054.53'
+    }
+    url='https://www.sogou.com/web'
+    #处理url携带的参数：封装到字典中
+    kw=input('enter a word: ')
+    param={
+        'query':kw
+    }
+    #对指定的url发起请求对应的url携带参数
+    response=requests.get(url=url,params=param,headers=headers)
+    page_text=response.text
+    fileName=kw+'.html'
+    with open(fileName,'w',encoding='utf-8')as fp:
+        fp.write(page_text)
+    print(fileName,'保存成功！！！')
